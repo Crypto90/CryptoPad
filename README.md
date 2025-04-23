@@ -6,6 +6,10 @@ Current controller / gamepad templates:
 - Xbox
 - PS5
 
+Download prebuild binary (.exe) version which is ready to run:
+
+[Download v0.0.5](https://github.com/Crypto90/CryptoPad/releases/download/0.0.5/CryptoPad_0.0.5.zip)
+
 Manual .py script run requires:
 
 pip install flask flask-socketio pygame eventlet requests
@@ -14,7 +18,6 @@ Then you can run it by:
 
 python CryptoPad.py
 
-or use the prebuild portable .exe file from releases.
 
 To build the exe yourself use:
 
