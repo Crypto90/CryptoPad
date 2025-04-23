@@ -3,6 +3,7 @@
 Download prebuild binary (.exe) version which is ready to run:
 
 [Download v0.0.5](https://github.com/Crypto90/CryptoPad/releases/download/0.0.5/CryptoPad_0.0.5.zip)
+
 ![til](./preview.png)
 
 Current controller / gamepad templates:
