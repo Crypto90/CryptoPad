@@ -1,3 +1,4 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K314GUP)
 # CryptoPad
 CryptoPad - OBS Controller / Gamepad Widget
 
