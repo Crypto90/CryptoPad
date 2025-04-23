@@ -46,6 +46,18 @@ def copy_templates():
         print(f"Copied templates to: {dest_templates}")
     return dest_templates
 
+def copy_static():
+    exe_dir = get_exe_dir()
+    temp_dir = getattr(sys, '_MEIPASS', exe_dir)
+
+    src_static = os.path.join(exe_dir, 'static')
+    dest_static = os.path.join(temp_dir, 'static')
+
+    if os.path.exists(src_static) and not os.path.exists(dest_static):
+        shutil.copytree(src_static, dest_static)
+        print(f"Copied static to: {dest_static}")
+    return dest_static
+
 def list_templates(template_dir):
     return [name for name in os.listdir(template_dir)
             if os.path.isdir(os.path.join(template_dir, name))]
@@ -113,13 +125,14 @@ base_dir = get_exe_dir()
 template_root = os.path.join(base_dir, 'templates')
 selected_template = select_template_gui(template_root)
 template_folder = copy_templates()
+template_static = copy_static()
 template_path = os.path.join(template_folder, selected_template)
 
 #print(f"Using template path: {template_path}")
 
 # Flask app
 app = Flask(__name__, template_folder=template_path)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 controller_state = {}
 
 @app.route('/')
