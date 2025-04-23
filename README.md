@@ -1,6 +1,10 @@
 # CryptoPad
 CryptoPad - OBS Controller / Gamepad Widget
 
+Current controller / gamepad templates:
+- Xbox
+- PS5
+
 Manual .py script run requires:
 pip install flask flask-socketio pygame eventlet requests
 
