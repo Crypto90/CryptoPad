@@ -15,3 +15,7 @@ python CryptoPad.py
 
 or use the prebuild portable .exe file from releases.
 
+To build the exe yourself use:
+
+pyinstaller CryptoPad.spec
+
