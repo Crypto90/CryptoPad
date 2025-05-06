@@ -14,11 +14,11 @@ import socket
 from contextlib import redirect_stdout
 import signal
 
-
+VERSION = "v0.0.6"
 
 # Console info
 print("\n==========================================")
-print("CryptoPad - OBS Controller Widget")
+print(f"CryptoPad - OBS Controller Widget {VERSION}")
 print("© Crypto90")
 print("https://github.com/Crypto90/CryptoPad")
 print("==========================================")
@@ -140,41 +140,53 @@ def index():
     return render_template('index.html')
 
 def controller_thread():
-    
     with open(os.devnull, 'w') as f, redirect_stdout(f):
         import pygame
         pygame.init()
         pygame.joystick.init()
 
-    # Print the message once
-    if not shutdown_event.is_set() and pygame.joystick.get_count() == 0:
-        print("No controller detected.", end='', flush=True)
-
-    dot_count = 1
-    while not shutdown_event.is_set() and pygame.joystick.get_count() == 0:
-        # Cycle the dot count between 1, 2, and 3
-        print(f"\rNo controller detected{'.' * dot_count}", end='', flush=True)
-        dot_count = (dot_count % 3) + 1  # Cycle dot_count between 1, 2, 3
-        time.sleep(1)
-        pygame.joystick.quit()
-        pygame.joystick.init()
-
-    if pygame.joystick.get_count() == 0 or shutdown_event.is_set():
-        return  # Exit early if no controller or shutdown triggered
-
-    joystick = pygame.joystick.Joystick(0)
-    joystick.init()
-    print(f"\rController initialized: {joystick.get_name()}")
+    joystick = None
 
     while not shutdown_event.is_set():
-        pygame.event.pump()
-        state = {
-            'axes': [joystick.get_axis(i) for i in range(joystick.get_numaxes())],
-            'buttons': [joystick.get_button(i) for i in range(joystick.get_numbuttons())],
-            'hats': joystick.get_hat(0)
-        }
-        socketio.emit('controller_data', state)
-        time.sleep(0.03)
+        # Wait for controller
+        while pygame.joystick.get_count() == 0 and not shutdown_event.is_set():
+            print("\rNo controller detected...", end='', flush=True)
+            time.sleep(1)
+            pygame.joystick.quit()
+            pygame.joystick.init()
+
+        if shutdown_event.is_set():
+            break
+
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+        print(f"\rController initialized: {joystick.get_name()}", end='', flush=True)
+
+        while not shutdown_event.is_set():
+            pygame.event.pump()
+
+            # Detect if controller was disconnected
+            if pygame.joystick.get_count() == 0:
+                print("\rNo controller detected...", end='', flush=True)
+                pygame.joystick.quit()
+                pygame.joystick.init()
+                break  # break inner loop to retry detection
+
+            try:
+                state = {
+                    'axes': [joystick.get_axis(i) for i in range(joystick.get_numaxes())],
+                    'buttons': [joystick.get_button(i) for i in range(joystick.get_numbuttons())],
+                    'hats': joystick.get_hat(0)
+                }
+                socketio.emit('controller_data', state)
+                time.sleep(0.03)
+            except pygame.error as e:
+                print(f"\n[ERROR] Controller error: {e}")
+                pygame.joystick.quit()
+                pygame.joystick.init()
+                break
+
+
 
 
 def get_lan_ip():
