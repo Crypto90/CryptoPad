@@ -9,7 +9,7 @@
 </head>
 <body>
   <div class="container" id="gamepads">
-    <div class="controller active half custom" id="gamepad-0" style="transform-origin: 0 0 0;">
+    <div class="controller active half custom invisible" id="gamepad-0" style="transform-origin: 0 0 0;">
 
         <div class="triggers">
             <span id="lt-fill" class="trigger left" data-name="button-left-shoulder-bottom"></span>
@@ -122,6 +122,18 @@
 	
 	
     const socket = io();
+	
+	
+	let lastDataTimestamp = Date.now();
+	let controller = document.getElementById('gamepad-0');
+	let fadeTimeout = null;
+
+	// Check every second if data hasn't come for 5s
+	setInterval(() => {
+	  if (Date.now() - lastDataTimestamp > 5000) {
+		controller.classList.add('invisible');
+	  }
+	}, 1000);
 
     socket.on('controller_data', data => {
       const buttons = data.buttons;
@@ -129,6 +141,8 @@
       const hat = data.hats;
 	  
 	  //console.log(data);
+	  lastDataTimestamp = Date.now();
+	  controller.classList.remove('invisible');
 	  
       // ABXY buttons
       ['a', 'b', 'x', 'y'].forEach((id, i) => {
