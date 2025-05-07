@@ -9,3 +9,12 @@
     margin-top: 30px !important;
     margin-left: 0px !important;
 }
+
+#gamepad-0 {
+    transition: opacity 1s ease;
+    opacity: 1;
+  }
+
+  #gamepad-0.invisible {
+    opacity: 0;
+  }
