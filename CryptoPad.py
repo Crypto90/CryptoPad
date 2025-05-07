@@ -14,7 +14,7 @@ import socket
 from contextlib import redirect_stdout
 import signal
 
-VERSION = "v0.0.6"
+VERSION = "v0.0.7"
 
 # Console info
 print("\n==========================================")
