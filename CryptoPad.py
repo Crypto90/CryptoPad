@@ -14,7 +14,7 @@ import socket
 from contextlib import redirect_stdout
 import signal
 
-VERSION = "v0.0.7"
+VERSION = "v0.0.8"
 
 # Console info
 print("\n==========================================")
@@ -160,6 +160,7 @@ def controller_thread():
 
         joystick = pygame.joystick.Joystick(0)
         joystick.init()
+        print(f"\r", end='', flush=True)
         print(f"\rController initialized: {joystick.get_name()}", end='', flush=True)
 
         while not shutdown_event.is_set():
@@ -167,6 +168,7 @@ def controller_thread():
 
             # Detect if controller was disconnected
             if pygame.joystick.get_count() == 0:
+                print(f"\r", end='', flush=True)
                 print("\rNo controller detected...", end='', flush=True)
                 pygame.joystick.quit()
                 pygame.joystick.init()
@@ -176,8 +178,9 @@ def controller_thread():
                 state = {
                     'axes': [joystick.get_axis(i) for i in range(joystick.get_numaxes())],
                     'buttons': [joystick.get_button(i) for i in range(joystick.get_numbuttons())],
-                    'hats': joystick.get_hat(0)
+                    'hats': [joystick.get_hat(i) for i in range(joystick.get_numhats())]
                 }
+                #print(state)
                 socketio.emit('controller_data', state)
                 time.sleep(0.03)
             except pygame.error as e:
