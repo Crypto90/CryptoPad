@@ -17,11 +17,11 @@
 }
 
 .custom .touchpad {
-    width: 262px;
-    height: 151px;
+    width: 333px;
+    height: 177px;
     position: absolute;
-    left: 272px;
-    top: 122px;
+    left: 237px;
+    top: 118px;
 }
 
 .custom .touchpad::after {
@@ -97,7 +97,7 @@
     height: 42px;
     position: absolute;
     left: 382px;
-    bottom: 216px;
+    bottom: 254px;
 }
 
 .custom .meta.pressed {

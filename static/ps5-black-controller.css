@@ -4,7 +4,7 @@ body {
     margin: 0 auto; 
     overflow: hidden; 
 } .controller.custom{
-    background: url(./images/ps5/base.png);
+    background: url(./images/ps5-black/base.png);
     width: 807px;
     height: 651px;
     margin-left: 0;
@@ -15,7 +15,7 @@ body {
     left: 220px;
     top: 333px;
 }.custom .stick {
-    background: url(./images/ps5/stick.png);
+    background: url(./images/ps5-black/stick.png);
     width: 100px;
     height: 100px;
 } .custom .stick.pressed {
@@ -29,7 +29,7 @@ body {
     left: 573px;
     top: 178px;
 } .custom .button {
-    background: url(./images/ps5/button.png);
+    background: url(./images/ps5-black/button.png);
     width: 58px;
     height: 58px;
 } .custom .button.pressed {
@@ -59,7 +59,7 @@ body {
 } .custom .quadrant { 
     display: none; 
 } .custom .back, .custom .start {
-    background: url(./images/ps5/back_start.png);
+    background: url(./images/ps5-black/back_start.png);
     width: 27px;
     height: 57px;
     opacity: 0;
@@ -72,7 +72,7 @@ body {
     left: 71px;
     top: 196px;
 } .custom .face {
-    background: url(./images/ps5/face.png) !important;
+    background: url(./images/ps5-black/face.png) !important;
     position: absolute;
     opacity: 0;
 } .custom .face.up.pressed {
@@ -89,9 +89,9 @@ body {
     top: 81px;
 	opacity: 1;
 }.custom .touchpad.pressed {
-    background: url(./images/ps5/touchpad.png) no-repeat center !important;
+    background: url(./images/ps5-black/touchpad.png) no-repeat center !important;
 }.custom .meta.pressed {
-    background: url(./images/ps5/meta.png) no-repeat center !important;
+    background: url(./images/ps5-black/meta.png) no-repeat center !important;
 } .custom .face.left.pressed {
     background-position: -108px -68px !important;
     width: 64px;
@@ -112,7 +112,7 @@ body {
     left: 93px;
     top: 114px;
 } .custom .bumper {
-    background: url(./images/ps5/bumper.png);
+    background: url(./images/ps5-black/bumper.png);
     width: 110px;
     height: 35px;
     opacity: 0;
@@ -121,7 +121,7 @@ body {
     height: 108px;
     left: 94px;
 } .custom .trigger {
-    background: url(./images/ps5/trigger.png);
+    background: url(./images/ps5-black/trigger.png);
     width: 111px;
     height: 108px;
     opacity: 0;
