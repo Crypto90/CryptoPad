@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PS5 Controller Visualizer</title>
+  <link rel="stylesheet" type="text/css" href="./static/custom-local.css">
+  <link rel="stylesheet" type="text/css" href="./static/ps5-black-controller.css">
+
+</head>
+<body>
+  <div class="container" id="gamepads">
+    <div class="controller active half custom invisible" id="gamepad-0" style="transform-origin: 0 0 0;">
+
+        <div class="triggers">
+            <span id="lt-fill" class="trigger left" data-name="button-left-shoulder-bottom"></span>
+            <span id="rt-fill" class="trigger right" data-name="button-right-shoulder-bottom"></span>
+            <span class="trigger-button left" data-name="button-left-shoulder-bottom-digital"></span>
+            <span class="trigger-button right" data-name="button-right-shoulder-bottom-digital"></span>
+            <span class="clear"></span>
+        </div>
+        <div class="bumpers">
+            <span id="lb" class="bumper left" data-name="button-left-shoulder-top"></span>
+            <span id="rb" class="bumper right" data-name="button-right-shoulder-top"></span>
+            <span class="clear"></span>
+        </div>
+        <div id="touchpad" class="touchpad" data-name="touch-pad"></div>
+        <div class="quadrant"></div>
+        <div id="meta" class="meta" data-name="button-meta"></div>
+        <div class="arrows">
+            <span id="select" class="back" data-name="button-select"></span>
+            <span id="start" class="start" data-name="button-start"></span>
+            <span class="clear"></span>
+        </div>
+        <div class="abxy">
+            <span id="a" class="button a" data-name="button-1"></span>
+            <span id="b" class="button b" data-name="button-2"></span>
+            <span id="x" class="button x" data-name="button-3"></span>
+            <span id="y" class="button y" data-name="button-4"></span>
+        </div>
+        <div class="sticks">
+            <span id="left-stick" class="stick left" data-name="stick-1"></span>
+            <span id="right-stick" class="stick right" data-name="stick-2"></span>
+        </div>
+        <div class="wheels">
+            <span class="wheel left" data-name="stick-1-wheel"></span>
+            <span class="wheel right" data-name="stick-2-wheel"></span>
+        </div>
+        <div class="dpad">
+            <span id="dpad-up" class="face up" data-name="button-dpad-top"></span>
+            <span id="dpad-down" class="face down" data-name="button-dpad-bottom"></span>
+            <span id="dpad-left" class="face left" data-name="button-dpad-left"></span>
+            <span id="dpad-right" class="face right" data-name="button-dpad-right"></span>
+        </div>
+        <div class="fstick" data-name="arcade-stick"></div>
+    </div>
+</div>
+  <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+  <script>
+	// If the number exceeds this in any way, we treat the label as active
+    // and highlight it.
+    var VISIBLE_THRESHOLD = 0.25;
+    // How far can a stick move on screen.
+    var STICK_OFFSET = 22;
+
+    //If stick curving should be enabled or not
+    var STICK_CURVING = 1;
+
+    var TRIGGER_DISPLAY_TYPE = 0;
+
+    // How deep does an analogue button need to be depressed to consider it
+    // a button down.
+
+    //For controllers like the Dualshock 3, which have analogue buttons instead of digital ones
+    var ANALOGUE_BUTTON_THRESHOLD = .25;
+    //Analogue stick threshold
+    var ANALOGUE_STICK_THRESHOLD = .25;
+    //Threshold for digital versions of analog buttons
+    var DIGITAL_THRESHOLD = .10;
+	
+	//Rotation limit
+    var ROTATE_BOUNDARY = 120;
+	
+	function updateAxis(value, valueV, gamepadId, stickId) {
+		var gamepadEl = document.querySelector('#gamepad-' + gamepadId);
+
+		function lineDistance(point1, point2) {
+			var xs = point1 - 0;
+			var ys = point2 - 0;
+
+			xs = xs * xs;
+			ys = ys * ys;
+
+			return Math.sqrt(xs + ys);
+		}
+
+		// Update the stick visually.
+		var stickEl = gamepadEl.querySelector('[data-name="' + stickId + '"]');
+		if (stickEl) { // Extraneous sticks have just a label.
+			var offsetValH, offsetValV;
+			if (lineDistance(value, valueV) >= ANALOGUE_STICK_THRESHOLD) {
+				offsetValH = value * STICK_OFFSET;
+				offsetValV = valueV * STICK_OFFSET;
+			} else {
+				offsetValH = 0;
+				offsetValV = 0;
+			}
+			stickEl.style.marginLeft = offsetValH + 'px';
+			stickEl.style.marginTop = offsetValV + 'px';
+			if (STICK_CURVING) {
+				stickEl.style.transform = 'rotateX(' + offsetValV * -1 + 'deg) rotateY(' + offsetValH + 'deg)';
+			}
+		}
+
+		// Update stick lateral rotation
+		var stickRotEL = gamepadEl.querySelector('[data-name="' + stickId + '-wheel"]');
+		if (stickRotEL) {
+			var rotValH = lineDistance(value, valueV) >= ANALOGUE_STICK_THRESHOLD ? value : 0;
+			stickRotEL.style.transform = 'rotate(' + rotValH * ROTATE_BOUNDARY + 'deg)';
+		}
+	}
+	
+	
+	
+    const socket = io();
+	
+	
+	let lastDataTimestamp = Date.now();
+	let controller = document.getElementById('gamepad-0');
+	let fadeTimeout = null;
+
+	// Check every second if data hasn't come for 5s
+	setInterval(() => {
+	  if (Date.now() - lastDataTimestamp > 5000) {
+		controller.classList.add('invisible');
+	  }
+	}, 1000);
+
+    socket.on('controller_data', data => {
+      const buttons = data.buttons;
+      const axes = data.axes;
+      const hat = data.hats;
+	  
+	  //console.log(data);
+	  lastDataTimestamp = Date.now();
+	  controller.classList.remove('invisible');
+	  
+      // ABXY buttons
+      ['a', 'b', 'x', 'y'].forEach((id, i) => {
+        document.getElementById(id).classList.toggle('pressed', buttons[i] === 1);
+      });
+
+      // Shoulder buttons
+      document.getElementById('lb').classList.toggle('pressed', buttons[9] === 1);
+      document.getElementById('rb').classList.toggle('pressed', buttons[10] === 1);
+	  
+	  // select start buttons
+	  document.getElementById('select').classList.toggle('pressed', buttons[4] === 1);
+      document.getElementById('start').classList.toggle('pressed', buttons[6] === 1);
+	  
+	  // touchpad
+	  document.getElementById('touchpad').classList.toggle('pressed', buttons[15] === 1);
+	  
+	  // ps meta button
+	  document.getElementById('meta').classList.toggle('pressed', buttons[5] === 1);
+	  
+      // Triggers (axes[4] for LT, axes[5] for RT)
+      const ltVal = (axes[4] + 1) / 2;
+      const rtVal = (axes[5] + 1) / 2;
+      document.getElementById('lt-fill').style.opacity = ltVal;
+      document.getElementById('rt-fill').style.opacity = rtVal;
+
+      // D-pad
+	  document.getElementById('dpad-up').classList.toggle('pressed', buttons[11] === 1);
+	  document.getElementById('dpad-down').classList.toggle('pressed', buttons[12] === 1);
+	  document.getElementById('dpad-left').classList.toggle('pressed', buttons[13] === 1);
+	  document.getElementById('dpad-right').classList.toggle('pressed', buttons[14] === 1);
+
+      // Sticks (left: axes[0,1], right: axes[2,3])
+      const leftX = axes[0], leftY = axes[1];
+      const rightX = axes[2], rightY = axes[3];
+	  updateAxis(leftX, leftY, 0, 'stick-1');
+	  updateAxis(rightX, rightY, 0, 'stick-2');
+	  
+	  document.getElementById('left-stick').classList.toggle('pressed', buttons[7] === 1);
+	  document.getElementById('right-stick').classList.toggle('pressed', buttons[8] === 1);
+    });
+  </script>
+</body>
+</html>
