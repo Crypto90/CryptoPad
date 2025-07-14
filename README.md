@@ -12,6 +12,9 @@ Download prebuild binary (.exe) version which is ready to run:
 
 ![til](./preview4.png)
 
+<img width="921" height="731" alt="image" src="https://github.com/user-attachments/assets/627f33cf-53a0-4aef-ad8b-1d5fd0632c5f" />
+
+
 Current controller / gamepad templates:
 - Xbox
 - PS5
