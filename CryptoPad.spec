@@ -7,10 +7,7 @@ a = Analysis(
     binaries=[],
     datas=[],
 	hiddenimports=[
-		'engineio.async_drivers.eventlet', 
-		'eventlet.hubs.epolls', 
-		'eventlet.hubs.kqueue', 
-		'eventlet.hubs.selects', 
+		'engineio.async_drivers.threading',
 		'dns', 
 		'dns.asyncbackend', 
 		'dns.asyncquery', 
@@ -48,10 +45,11 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+	icon='icon.ico'
 )
