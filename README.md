@@ -4,9 +4,7 @@ Download prebuild binary (.exe) version which is ready to run:
 
 [Download v0.0.9](https://github.com/Crypto90/CryptoPad/releases/download/0.0.9/CryptoPad_v0.0.9.zip)
 
-![til](./preview.png)
-
-![til](./preview2.png)
+<img width="602" height="389" alt="image" src="https://github.com/user-attachments/assets/523c80e4-ae91-44d9-bcd7-57b72f279de4" />
 
 ![til](./preview3.png)
 
