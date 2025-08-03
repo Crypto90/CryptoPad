@@ -13,6 +13,9 @@ import tkinter as tk
 from tkinter import ttk
 from jinja2 import FileSystemLoader, ChoiceLoader
 import webbrowser
+import logging
+
+
 
 VERSION = "v0.0.9"
 
@@ -34,6 +37,44 @@ def get_exe_dir():
     if getattr(sys, '_MEIPASS', False):
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.abspath(__file__))
+
+
+log_path = os.path.join(get_exe_dir(), 'CryptoPad.log')
+
+class LazyErrorFileHandler(logging.Handler):
+    def __init__(self, path):
+        super().__init__(level=logging.ERROR)
+        self.path = path
+        self.file_handler = None
+
+    def emit(self, record):
+        if self.file_handler is None:
+            # First error — create file handler and add it to root logger
+            self.file_handler = logging.FileHandler(self.path, mode='a', encoding='utf-8')
+            self.file_handler.setLevel(logging.ERROR)
+            formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+            self.file_handler.setFormatter(formatter)
+            logging.getLogger().addHandler(self.file_handler)
+        # Delegate actual writing to file handler
+        self.file_handler.emit(record)
+
+# Set up root logger with console output or no file handler
+logging.basicConfig(
+    level=logging.INFO,  # or DEBUG if you want console info logs
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[logging.StreamHandler()]  # or omit to silence output
+)
+
+# Add lazy file handler that creates log file only on first error
+logging.getLogger().addHandler(LazyErrorFileHandler(log_path))
+
+# Silence noisy libraries, still only errors to file
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
+logging.getLogger('flask').setLevel(logging.ERROR)
+logging.getLogger('socketio').setLevel(logging.ERROR)
+logging.getLogger('engineio').setLevel(logging.ERROR)
+
+
 
 def copy_templates():
     exe_dir = get_exe_dir()
@@ -375,11 +416,12 @@ def run_tkinter_gui_process(q_flask, q_ctrl, status_q, lan_ip, wport):
     select_template_gui(template_root, q_flask, q_ctrl, status_q, lan_ip, wport)
 
 def run_flask(wport):
-    print(f"[INFO] Starting Flask server with template: {current_template}")
     try:
-        socketio.run(app, host='0.0.0.0', port=wport)
-    except SystemExit:
-        print("[INFO] Flask server shut down.")
+        logging.info(f"Starting Flask server with template: {current_template}")
+        socketio.run(app, host='0.0.0.0', port=wport, debug=False, allow_unsafe_werkzeug=True)
+    except Exception:
+        logging.exception("Flask server failed to start:")
+
 
 
 if __name__ == '__main__':
