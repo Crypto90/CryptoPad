@@ -2,7 +2,7 @@
 # CryptoPad - OBS Controller / Gamepad Widget
 Download prebuild binary (.exe) version which is ready to run:
 
-[Download v0.0.7](https://github.com/Crypto90/CryptoPad/releases/download/0.0.7/CryptoPad_v0.0.7.zip)
+[Download v0.0.9](https://github.com/Crypto90/CryptoPad/releases/download/0.0.9/CryptoPad_v0.0.9.zip)
 
 ![til](./preview.png)
 
