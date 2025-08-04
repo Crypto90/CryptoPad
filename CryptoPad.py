@@ -17,7 +17,7 @@ import logging
 
 
 
-VERSION = "v0.0.9"
+VERSION = "v0.1.0"
 
 print("\n==========================================")
 print(f"CryptoPad - OBS Controller Widget {VERSION}")
@@ -137,9 +137,8 @@ def select_template_gui(template_dir, queue_flask, queue_ctrl, status_queue, lan
         except:
             pass
         skin = selected_template
-        preview_path = os.path.join(base_dir, "static", "images", "base.png")
-        if skin != "Xbox":
-            preview_path = os.path.join(base_dir, "static", "images", skin, "base.png")
+        preview_path = os.path.join(base_dir, "static", "images", skin, "preview.png")
+        
         if os.path.exists(preview_path):
             try:
                 img = Image.open(preview_path)
