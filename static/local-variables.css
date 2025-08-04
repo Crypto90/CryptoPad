@@ -1,0 +1,12 @@
+:root {
+    --controller-background-image: url(./images/Xbox/base.svg);
+    --controller-disconnected-image: url(./images/Xbox/disconnected.svg);
+    --controller-touchpad-image: url(./images/Xbox/logo.png);
+    --controller-trigger-image: url(./images/Xbox/trigger.svg);
+    --controller-bumper-image: url(./images/Xbox/bumper.svg);
+    --controller-meta-pressed-image: url(./images/Xbox/meta.svg);
+    --controller-start-image: url(./images/Xbox/start-select.svg);
+    --controller-button-image: url(./images/Xbox/abxy.svg);
+    --controller-stick-image: url(./images/Xbox/stick.svg);
+    --controller-face-image: url(./images/Xbox/dpad.svg);
+}

@@ -1,0 +1,193 @@
+body { 
+    background-color: #000000; 
+    background-color: RGBA(0, 0, 0, 0); 
+    margin: 0 auto; 
+    overflow: hidden; 
+} .controller.custom{
+    background: url("./images/PS4/base.svg");
+    width: 806px;
+    height: 599px;
+    margin-left: 0;
+    margin-top: 0;
+} .custom .sticks {
+    position: absolute;
+    width: 361px;
+    height: 105px;
+    top: 308px;
+    left: 228px;
+}.custom .stick {
+    background: url("./images/PS4/sticks.svg");
+    position: absolute;
+    height: 94px;
+    width: 94px;
+} .custom .stick.pressed {
+    background-position: -96px 0 !important;
+} .custom .stick.right {
+	top: calc(100% - 105px);
+    left: calc(100% - 105px);
+} .custom .abxy {
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    top: 159px;
+    left: 567px;
+} .custom .button {
+    background: url("./images/PS4/buttons.svg");
+    position: absolute;
+    width: 56px;
+    height: 55px;
+} .custom .button.pressed {
+    background-position-y: -56px;
+    margin-top: 0;
+} .custom .a {
+    background-position: 0 0;
+    bottom: 0px;
+    left: 56px;
+} .custom .b {
+    background-position: -56px 0;
+    top: 56px;
+    right: 0px;
+} .custom .x {
+    background-position: 112px 0;
+    top: 56px;
+} .custom .y {
+    background-position: 56px 0;
+    left: 56px;
+} .custom .arrows {
+    position: absolute;
+    width: 352px;
+    height: 46px;
+    top: 142px;
+    left: 227px;
+} .custom .quadrant { 
+    display: none; 
+} .custom .back, .custom .start {
+    background: url("./images/PS4/start.svg");
+    width: 28px;
+    height: 46px;
+    opacity: 0;
+} .custom .start {
+    float: right;
+} .custom .select {
+    float: left;
+} .custom .dpad {
+    position: absolute;
+    width: 125px;
+    height: 126px;
+    top: 181px;
+    left: 92px;
+}
+
+.custom .face.up,
+.custom .face.down {
+    width: 36px;
+    height: 52px;
+}
+
+.custom .face.left,
+.custom .face.right {
+    width: 52px;
+    height: 36px;
+}
+
+.custom .face.up {
+    left: 44px;
+    top: 0;
+    background-position: -37px 0px !important;
+}
+
+.custom .face.down {
+    left: 44px;
+    bottom: 0;
+    background-position: 0px 0 !important;
+}
+
+.custom .face.left {
+    top: 44px;
+    left: 0;
+    background-position: 104px 0 !important;
+}
+
+.custom .face.right {
+    top: 44px;
+    right: 0px;
+    background-position: 52px 0 !important;
+}
+
+
+ .custom .face {
+    background: url("./images/PS4/face.svg") !important;
+    position: absolute;
+} .custom .face.up.pressed {
+    background-position-y: 52px !important;
+	opacity: 1;
+} .custom .face.down.pressed {
+    background-position-y: 52px !important;
+	opacity: 1;
+} .custom .touchpad {
+	width: 262px;
+    height: 151px;
+    position: absolute;
+    left: 272px;
+    top: 122px;
+} .custom .touchpad.pressed {
+    background: url("./images/PS4/touchpad.svg") no-repeat center !important;
+} .custom .meta {
+	width: 42px;
+    height: 42px;
+    position: absolute;
+    left: 382px;
+    bottom: 216px;
+} .custom .meta.pressed {
+    background: url("./images/PS4/meta.svg") no-repeat center !important;
+} .custom .face.left.pressed {
+    background-position-y: 52px !important;
+	opacity: 1;
+} .custom .face.right.pressed {
+    background-position-y: 52px !important;
+	opacity: 1;
+} .custom .bumpers {
+    position: absolute;
+    width: 588px;
+    height: 22px;
+    left: 109px;
+    top: 94px;
+} .custom .bumper {
+    background: url("./images/PS4/bumper.svg");
+    width: 99px;
+    height: 22px;
+    opacity: 0;
+} .custom .triggers {
+    width: 588px;
+    height: 90px;
+    position: absolute;
+    left: 109px;
+} .custom .trigger {
+    background: url("./images/PS4/triggers.svg");
+    width: 99px;
+    height: 100%;
+} .custom .trigger.right {
+    float: right;
+    background-position-x: 99px;
+	transform: none !important;
+}
+
+.custom .trigger.left {
+    float: left;
+}
+
+.custom .bumper.left {
+    /* -webkit-transform: rotateY(180deg); */
+    /* transform: rotateY(180deg); */
+    float: left;
+}
+
+.custom .bumper.right {
+    float: right;
+    transform: rotateY(180deg);
+}
+/*
+The general design of the DualSense (tm) controller, as well as the PlayStation (tm) logo, are the intellectual property of Sony.
+Vectorized design referenced in the images linked above: copyright (c) CrazyGrape 2021
+This work is licensed under a Creative Commons Attribution 3.0 United States License. The terms of this license are available at https://creativecommons.org/licenses/by/3.0/us/
+*/
