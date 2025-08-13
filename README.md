@@ -37,7 +37,7 @@ Current controller / gamepad templates:
 
 
 
-
+# Manual instructions
 Manual .py script run requires:
 
 pip install flask flask-socketio pygame eventlet requests
