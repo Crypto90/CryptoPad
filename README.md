@@ -1,5 +1,8 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K314GUP)
 # CryptoPad - OBS Controller / Gamepad Widget
+A standalone controller overlay widget which works with dual streaming (2 computer) setups too!
+
+# Download
 Download prebuild binary (.exe) version which is ready to run:
 
 [Download v0.1.0](https://github.com/Crypto90/CryptoPad/releases/download/0.1.0/CryptoPad_v0.1.0.zip)
