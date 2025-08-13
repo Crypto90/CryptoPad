@@ -7,11 +7,9 @@ Download prebuild binary (.exe) version which is ready to run:
 
 [Download v0.1.0](https://github.com/Crypto90/CryptoPad/releases/download/0.1.0/CryptoPad_v0.1.0.zip)
 
+
+# Screenshots
 <img width="602" height="539" alt="image" src="https://github.com/user-attachments/assets/403ba327-fcf4-4849-bc3b-6e826524a873" />
-
-
-
-
 
 Current controller / gamepad templates:
 - PS4
