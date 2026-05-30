@@ -17,7 +17,7 @@ import logging
 
 
 
-VERSION = "v0.1.0"
+VERSION = "v0.1.1"
 
 print("\n==========================================")
 print(f"CryptoPad - OBS Controller Widget {VERSION}")
