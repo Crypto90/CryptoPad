@@ -1,0 +1,136 @@
+body { 
+    background-color: #000000; 
+    background-color: RGBA(0, 0, 0, 0); 
+    margin: 0 auto; 
+    overflow: hidden; 
+} .controller.custom{
+    background: url(./images/PS5/base.png);
+    width: 807px;
+    height: 651px;
+    margin-left: 0;
+    margin-top: 0;
+} .custom .sticks {
+    width: 367px;
+    height: 100px;
+    left: 220px;
+    top: 333px;
+}.custom .stick {
+    background: url(./images/PS5/stick.png);
+    width: 100px;
+    height: 100px;
+} .custom .stick.pressed {
+    background-position: -102px 0 !important;
+} .custom .stick.right {
+    top: 0;
+    left: 267px;
+} .custom .abxy {
+    width: 181px;
+    height: 181px;
+    left: 573px;
+    top: 178px;
+} .custom .button {
+    background: url(./images/PS5/button.png);
+    width: 58px;
+    height: 58px;
+} .custom .button.pressed {
+    background-position-y: -59px;
+    margin-top: 0;
+} .custom .a {
+    background-position: 0 0;
+    left: 61px;
+    top: 123px;
+} .custom .b {
+    background-position: -59px 0;
+    left: 123px;
+    top: 62px;
+} .custom .x {
+    background-position: -118px 0;
+    left: 0px;
+    top: 61px;
+} .custom .y {
+    background-position: -177px 0;
+    left: 61px;
+    top: 0px;
+} .custom .arrows {
+    left: 195px;
+    top: 140px;
+    width: 416px;
+    height: 57px;
+} .custom .quadrant { 
+    display: none; 
+} .custom .back, .custom .start {
+    background: url(./images/PS5/back_start.png);
+    width: 27px;
+    height: 57px;
+    opacity: 0;
+} .custom .start {
+    background-position: 27px 0;
+    float: right;
+} .custom .dpad {
+    width: 144px;
+    height: 144px;
+    left: 71px;
+    top: 196px;
+} .custom .face {
+    background: url(./images/PS5/face.png) !important;
+    position: absolute;
+    opacity: 0;
+} .custom .face.up.pressed {
+    background-position: 0 -68px !important;
+    width: 52px;
+    height: 63px;
+    left: 46px;
+	opacity: 1;
+} .custom .face.down.pressed {
+    background-position: -54px 63px !important;
+    width: 52px;
+    height: 63px;
+    left: 46px;
+    top: 81px;
+	opacity: 1;
+}.custom .touchpad.pressed {
+    background: url(./images/PS5/touchpad.png) no-repeat center !important;
+}.custom .meta.pressed {
+    background: url(./images/PS5/meta.png) no-repeat center !important;
+} .custom .face.left.pressed {
+    background-position: -108px -68px !important;
+    width: 64px;
+    height: 52px;
+    left: -1px;
+    top: 47px; 
+	opacity: 1;
+} .custom .face.right.pressed {
+    background-position: -175px -68px !important;
+    width: 63px;
+    height: 52px;
+    left: 81px;
+    top: 46px;
+	opacity: 1;
+} .custom .bumpers {
+    width: 620px;
+    height: 35px;
+    left: 93px;
+    top: 114px;
+} .custom .bumper {
+    background: url(./images/PS5/bumper.png);
+    width: 110px;
+    height: 35px;
+    opacity: 0;
+} .custom .triggers {
+    width: 619px;
+    height: 108px;
+    left: 94px;
+} .custom .trigger {
+    background: url(./images/PS5/trigger.png);
+    width: 111px;
+    height: 108px;
+    opacity: 0;
+} .custom .trigger.right {
+    background-position: -113px 0;
+    transform: rotateY(0);
+}
+/*
+The general design of the DualSense (tm) controller, as well as the PlayStation (tm) logo, are the intellectual property of Sony.
+Vectorized design referenced in the images linked above: copyright (c) CrazyGrape 2021
+This work is licensed under a Creative Commons Attribution 3.0 United States License. The terms of this license are available at https://creativecommons.org/licenses/by/3.0/us/
+*/

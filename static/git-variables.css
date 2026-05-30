@@ -1,0 +1,12 @@
+:root {
+    --controller-background-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/base.svg);
+    --controller-disconnected-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/disconnected.svg);
+    --controller-touchpad-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/logo.png);
+    --controller-trigger-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/trigger.svg);
+    --controller-bumper-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/bumper.svg);
+    --controller-meta-pressed-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/meta.svg);
+    --controller-start-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/start-select.svg);
+    --controller-button-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/abxy.svg);
+    --controller-stick-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/stick.svg);
+    --controller-face-image: url(https://cdn.statically.io/gh/AlexanderSkrock/GamePadViewer/master/images/dpad.svg);
+}
