@@ -5,15 +5,17 @@ A standalone controller overlay widget which works with dual streaming (2 comput
 # Download
 Download prebuild binary (.exe) version which is ready to run:
 
-[Download v0.1.0](https://github.com/Crypto90/CryptoPad/releases/download/0.1.0/CryptoPad_v0.1.0.zip)
+[Download v0.1.1](https://github.com/Crypto90/CryptoPad/releases/download/0.1.1/CryptoPad_v0.1.1.zip)
 
 
 # Screenshots
-<img width="602" height="539" alt="image" src="https://github.com/user-attachments/assets/403ba327-fcf4-4849-bc3b-6e826524a873" />
+<img width="602" height="589" alt="image" src="https://github.com/user-attachments/assets/de5475af-a67e-4e76-92e7-fb873c716450" />
+
 
 Current controller / gamepad templates:
 - PS4
 - PS4 (blue)
+- PS4 (dracula)
 - PS4 (red)
 - PS4 (white)
 - PS5
@@ -21,6 +23,7 @@ Current controller / gamepad templates:
 - PS5 (cosmic red)
 - Xbox
 - Xbox (blue)
+- Xbox (dracula)
 - Xbox (white)
 
 
