@@ -23,6 +23,7 @@ from tkinter import ttk, messagebox
 from jinja2 import FileSystemLoader, ChoiceLoader
 from flask import Flask, render_template
 from flask_socketio import SocketIO
+import engineio.async_drivers.threading
 
 # High-DPI and Windows-specific imports
 IS_WINDOWS = sys.platform == "win32"
@@ -32,7 +33,7 @@ if IS_WINDOWS:
     from ctypes import wintypes
 
 
-CURRENT_VERSION = "v0.2.1"
+CURRENT_VERSION = "v0.2.2"
 SETTINGS_FILENAME = "cryptopad_settings.json"
 LEGACY_TEMPLATE_FILE = ".last_template"
 DEFAULT_TEMPLATE = "Xbox"
@@ -65,7 +66,7 @@ def get_exe_dir():
 
 
 def get_data_dir():
-    """
+    r"""
     Returns a reliable, writable directory for settings storage.
     Uses executable directory if writable (portable mode),
     otherwise falls back to %LOCALAPPDATA%\Crypto90s_CryptoPad.

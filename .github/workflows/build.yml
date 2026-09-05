@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Executable
         run: |
-          pyinstaller --onefile --noconsole --name "CryptoPad" --add-data "templates;templates" --add-data "static;static" CryptoPad.py
+          pyinstaller --onefile --noconsole --name "CryptoPad" --icon "icon.ico" --hidden-import "engineio.async_drivers.threading" --add-data "templates;templates" --add-data "static;static" CryptoPad.py
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
