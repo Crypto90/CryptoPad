@@ -10,6 +10,7 @@ License: MIT License
 import sys
 import os
 import time
+import datetime
 import json
 import shutil
 import socket
@@ -33,7 +34,7 @@ if IS_WINDOWS:
     from ctypes import wintypes
 
 
-CURRENT_VERSION = "v0.2.2"
+CURRENT_VERSION = "v0.2.3"
 SETTINGS_FILENAME = "cryptopad_settings.json"
 LEGACY_TEMPLATE_FILE = ".last_template"
 DEFAULT_TEMPLATE = "Xbox"

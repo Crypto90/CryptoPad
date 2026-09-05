@@ -41,7 +41,7 @@ End-users do **not** need Python installed. Standalone Windows executables are c
 
 | Version | Asset | Direct Download | Platform |
 | :---: | :---: | :---: | :---: |
-| **v0.2.2** *(Latest)* | `CryptoPad.exe` | [**⬇️ Download v0.2.2 Executable**](https://github.com/Crypto90/CryptoPad/releases/download/0.2.2/CryptoPad.exe) | Windows 10 / 11 (64-bit) |
+| **v0.2.3** *(Latest)* | `CryptoPad.exe` | [**⬇️ Download v0.2.3 Executable**](https://github.com/Crypto90/CryptoPad/releases/download/0.2.3/CryptoPad.exe) | Windows 10 / 11 (64-bit) |
 
 > 📁 Browse all versions and changelogs in [GitHub Releases](https://github.com/Crypto90/CryptoPad/releases).
 
