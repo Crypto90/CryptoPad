@@ -1,6 +1,6 @@
 """
 CryptoPad - OBS Streaming Gamepad / Controller Overlay Widget
-Broadcast-ready real-time controller visualizer for OBS Studio & Dual-PC streaming rigs.
+Broadcast-ready real-time controller visualizer with Cross-Controller Mapping Engine.
 
 Author: Crypto90
 Repository: https://github.com/Crypto90/CryptoPad
@@ -32,7 +32,7 @@ if IS_WINDOWS:
     from ctypes import wintypes
 
 
-CURRENT_VERSION = "v0.2.0"
+CURRENT_VERSION = "v0.2.1"
 SETTINGS_FILENAME = "cryptopad_settings.json"
 LEGACY_TEMPLATE_FILE = ".last_template"
 DEFAULT_TEMPLATE = "Xbox"
@@ -95,7 +95,8 @@ def load_settings():
     defaults = {
         "version": CURRENT_VERSION,
         "template": DEFAULT_TEMPLATE,
-        "port": 5001
+        "port": 5001,
+        "input_profile": "auto"  # auto, xbox, playstation, nintendo
     }
 
     if os.path.exists(path):
@@ -157,12 +158,10 @@ def find_available_port(preferred_port=5001, max_attempts=20):
 
 # Resource directory resolution for PyInstaller
 def resolve_resource_dir(dir_name):
-    # PyInstaller temp folder check
     if getattr(sys, '_MEIPASS', False):
         p = os.path.join(sys._MEIPASS, dir_name)
         if os.path.exists(p):
             return p
-    # App root check
     local_p = os.path.join(get_exe_dir(), dir_name)
     if os.path.exists(local_p):
         return local_p
@@ -172,9 +171,9 @@ def resolve_resource_dir(dir_name):
 template_root = resolve_resource_dir('templates')
 static_root = resolve_resource_dir('static')
 
-# Settings & Network Initialization
 settings = load_settings()
 current_template = settings.get("template", DEFAULT_TEMPLATE)
+current_input_profile = settings.get("input_profile", "auto")
 server_port = find_available_port(settings.get("port", 5001))
 lan_ip = get_lan_ip()
 
@@ -182,7 +181,6 @@ lan_ip = get_lan_ip()
 app = Flask(__name__, static_folder=static_root, template_folder=template_root)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
-# Suppress noisy HTTP logs
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 logging.getLogger('socketio').setLevel(logging.ERROR)
 logging.getLogger('engineio').setLevel(logging.ERROR)
@@ -190,6 +188,7 @@ logging.getLogger('engineio').setLevel(logging.ERROR)
 template_queue_flask = queue.Queue()
 template_queue_controller = queue.Queue()
 controller_status_queue = queue.Queue()
+input_profile_queue = queue.Queue()
 
 
 def list_available_templates():
@@ -232,8 +231,187 @@ def api_status():
         "status": "online",
         "version": CURRENT_VERSION,
         "template": current_template,
+        "input_profile": current_input_profile,
         "port": server_port
     }
+
+
+# =====================================================================
+# Cross-Controller Normalization Engine
+# =====================================================================
+def normalize_controller_input(joystick, profile_setting="auto"):
+    """
+    Translates physical controller hardware (Xbox, PlayStation, Nintendo, Generic)
+    into a standardized logical gamepad model so ANY controller can visualize
+    correctly on ANY layout (Xbox on PS5, PS4 on Xbox, etc.).
+    """
+    num_b = joystick.get_numbuttons()
+    num_a = joystick.get_numaxes()
+    num_h = joystick.get_numhats()
+
+    raw_b = [joystick.get_button(i) for i in range(num_b)]
+    raw_a = [joystick.get_axis(i) for i in range(num_a)]
+    raw_h = [joystick.get_hat(i) for i in range(num_h)]
+
+    ctrl_name = joystick.get_name().lower()
+
+    # Determine hardware profile
+    detected = "xbox"
+    if profile_setting == "playstation":
+        detected = "playstation"
+    elif profile_setting == "nintendo":
+        detected = "nintendo"
+    elif profile_setting == "xbox":
+        detected = "xbox"
+    else:
+        # Auto-detect mode
+        if any(w in ctrl_name for w in ["ps4", "ps5", "playstation", "dualshock", "dualsense", "sony"]) or num_b >= 14:
+            detected = "playstation"
+        elif any(w in ctrl_name for w in ["switch", "nintendo", "joy-con", "pro controller"]):
+            detected = "nintendo"
+        else:
+            detected = "xbox"
+
+    standard = {
+        "a": False,         # Bottom: Xbox A / PS Cross
+        "b": False,         # Right:  Xbox B / PS Circle
+        "x": False,         # Left:   Xbox X / PS Square
+        "y": False,         # Top:    Xbox Y / PS Triangle
+        "lb": False,        # Left Bumper / L1
+        "rb": False,        # Right Bumper / R1
+        "select": False,    # Back / Share / Select / -
+        "start": False,     # Start / Options / Menu / +
+        "ls": False,        # Left Stick Click (L3)
+        "rs": False,        # Right Stick Click (R3)
+        "meta": False,      # Guide / PS Button
+        "touchpad": False,  # Touchpad Click
+        "dpad_up": False,
+        "dpad_down": False,
+        "dpad_left": False,
+        "dpad_right": False,
+        "left_stick_x": 0.0,
+        "left_stick_y": 0.0,
+        "right_stick_x": 0.0,
+        "right_stick_y": 0.0,
+        "lt": 0.0,
+        "rt": 0.0
+    }
+
+    if detected == "xbox":
+        # Standard XInput / Xbox Mapping
+        if num_b > 0: standard["a"] = bool(raw_b[0])
+        if num_b > 1: standard["b"] = bool(raw_b[1])
+        if num_b > 2: standard["x"] = bool(raw_b[2])
+        if num_b > 3: standard["y"] = bool(raw_b[3])
+        if num_b > 4: standard["lb"] = bool(raw_b[4])
+        if num_b > 5: standard["rb"] = bool(raw_b[5])
+        if num_b > 6: standard["select"] = bool(raw_b[6])
+        if num_b > 7: standard["start"] = bool(raw_b[7])
+        if num_b > 8: standard["ls"] = bool(raw_b[8])
+        if num_b > 9: standard["rs"] = bool(raw_b[9])
+        if num_b > 10: standard["meta"] = bool(raw_b[10])
+
+        if num_h > 0:
+            hx, hy = raw_h[0]
+            standard["dpad_up"] = (hy == 1)
+            standard["dpad_down"] = (hy == -1)
+            standard["dpad_left"] = (hx == -1)
+            standard["dpad_right"] = (hx == 1)
+
+        if num_a > 0: standard["left_stick_x"] = float(raw_a[0])
+        if num_a > 1: standard["left_stick_y"] = float(raw_a[1])
+        if num_a > 2: standard["right_stick_x"] = float(raw_a[2])
+        if num_a > 3: standard["right_stick_y"] = float(raw_a[3])
+        if num_a > 4: standard["lt"] = max(0.0, min(1.0, (float(raw_a[4]) + 1.0) / 2.0))
+        if num_a > 5: standard["rt"] = max(0.0, min(1.0, (float(raw_a[5]) + 1.0) / 2.0))
+
+    elif detected == "playstation":
+        # Standard PlayStation DirectInput / HID Mapping
+        if num_b >= 14:
+            # 0: Square, 1: Cross, 2: Circle, 3: Triangle
+            standard["x"] = bool(raw_b[0])
+            standard["a"] = bool(raw_b[1])
+            standard["b"] = bool(raw_b[2])
+            standard["y"] = bool(raw_b[3])
+
+            if num_b > 9: standard["lb"] = bool(raw_b[9])
+            elif num_b > 4: standard["lb"] = bool(raw_b[4])
+
+            if num_b > 10: standard["rb"] = bool(raw_b[10])
+            elif num_b > 5: standard["rb"] = bool(raw_b[5])
+
+            if num_b > 4: standard["select"] = bool(raw_b[4] if num_b > 9 else raw_b[8])
+            if num_b > 6: standard["start"] = bool(raw_b[6] if num_b > 10 else raw_b[9])
+
+            if num_b > 8:
+                standard["ls"] = bool(raw_b[7] if num_b > 10 else raw_b[10])
+                standard["rs"] = bool(raw_b[8] if num_b > 10 else raw_b[11])
+
+            if num_b > 5: standard["meta"] = bool(raw_b[5] if num_b > 12 else raw_b[12])
+            if num_b > 15: standard["touchpad"] = bool(raw_b[15] if num_b > 15 else raw_b[13])
+
+            if num_b > 14 and any(raw_b[11:15]):
+                standard["dpad_up"] = bool(raw_b[11])
+                standard["dpad_down"] = bool(raw_b[12])
+                standard["dpad_left"] = bool(raw_b[13])
+                standard["dpad_right"] = bool(raw_b[14])
+            elif num_h > 0:
+                hx, hy = raw_h[0]
+                standard["dpad_up"] = (hy == 1)
+                standard["dpad_down"] = (hy == -1)
+                standard["dpad_left"] = (hx == -1)
+                standard["dpad_right"] = (hx == 1)
+        else:
+            if num_b > 0: standard["a"] = bool(raw_b[0])
+            if num_b > 1: standard["b"] = bool(raw_b[1])
+            if num_b > 2: standard["x"] = bool(raw_b[2])
+            if num_b > 3: standard["y"] = bool(raw_b[3])
+            if num_b > 4: standard["lb"] = bool(raw_b[4])
+            if num_b > 5: standard["rb"] = bool(raw_b[5])
+            if num_b > 6: standard["select"] = bool(raw_b[6])
+            if num_b > 7: standard["start"] = bool(raw_b[7])
+            if num_b > 8: standard["ls"] = bool(raw_b[8])
+            if num_b > 9: standard["rs"] = bool(raw_b[9])
+
+        if num_a > 0: standard["left_stick_x"] = float(raw_a[0])
+        if num_a > 1: standard["left_stick_y"] = float(raw_a[1])
+        if num_a > 2: standard["right_stick_x"] = float(raw_a[2])
+        if num_a > 3: standard["right_stick_y"] = float(raw_a[3])
+        if num_a > 4: standard["lt"] = max(0.0, min(1.0, (float(raw_a[4]) + 1.0) / 2.0))
+        elif num_b > 6: standard["lt"] = 1.0 if raw_b[6] else 0.0
+
+        if num_a > 5: standard["rt"] = max(0.0, min(1.0, (float(raw_a[5]) + 1.0) / 2.0))
+        elif num_b > 7: standard["rt"] = 1.0 if raw_b[7] else 0.0
+
+    elif detected == "nintendo":
+        # Nintendo Switch Physical -> Standard
+        if num_b > 0: standard["a"] = bool(raw_b[0])  # B -> Bottom
+        if num_b > 1: standard["b"] = bool(raw_b[1])  # A -> Right
+        if num_b > 2: standard["x"] = bool(raw_b[2])  # Y -> Left
+        if num_b > 3: standard["y"] = bool(raw_b[3])  # X -> Top
+        if num_b > 4: standard["select"] = bool(raw_b[4])
+        if num_b > 5: standard["start"] = bool(raw_b[5])
+        if num_b > 6: standard["ls"] = bool(raw_b[6])
+        if num_b > 7: standard["rs"] = bool(raw_b[7])
+        if num_b > 8: standard["lb"] = bool(raw_b[8])
+        if num_b > 9: standard["rb"] = bool(raw_b[9])
+        if num_b > 10: standard["lt"] = 1.0 if raw_b[10] else 0.0
+        if num_b > 11: standard["rt"] = 1.0 if raw_b[11] else 0.0
+        if num_b > 12: standard["meta"] = bool(raw_b[12])
+
+        if num_h > 0:
+            hx, hy = raw_h[0]
+            standard["dpad_up"] = (hy == 1)
+            standard["dpad_down"] = (hy == -1)
+            standard["dpad_left"] = (hx == -1)
+            standard["dpad_right"] = (hx == 1)
+
+        if num_a > 0: standard["left_stick_x"] = float(raw_a[0])
+        if num_a > 1: standard["left_stick_y"] = float(raw_a[1])
+        if num_a > 2: standard["right_stick_x"] = float(raw_a[2])
+        if num_a > 3: standard["right_stick_y"] = float(raw_a[3])
+
+    return standard, detected
 
 
 # Pygame Gamepad Polling Worker Thread
@@ -249,9 +427,9 @@ def controller_worker(status_q):
 
     joystick = None
     last_known_template = current_template
+    active_profile = current_input_profile
 
     while not shutdown_event.is_set():
-        # Wait for gamepad connection
         while pygame.joystick.get_count() == 0 and not shutdown_event.is_set():
             try:
                 status_q.put_nowait({"status": "disconnected", "name": None})
@@ -276,15 +454,19 @@ def controller_worker(status_q):
             time.sleep(1.0)
             continue
 
-        # Active polling loop
         while not shutdown_event.is_set():
-            # Check for template changes requested from GUI
             while not template_queue_controller.empty():
                 try:
                     new_t = template_queue_controller.get_nowait()
                     if new_t != last_known_template:
                         last_known_template = new_t
                         socketio.emit('reload_page')
+                except Exception:
+                    pass
+
+            while not input_profile_queue.empty():
+                try:
+                    active_profile = input_profile_queue.get_nowait()
                 except Exception:
                     pass
 
@@ -303,13 +485,17 @@ def controller_worker(status_q):
                 break
 
             try:
-                state = {
+                standard_data, profile_used = normalize_controller_input(joystick, active_profile)
+
+                payload = {
+                    'standard': standard_data,
+                    'profile': profile_used,
                     'axes': [joystick.get_axis(i) for i in range(joystick.get_numaxes())],
                     'buttons': [joystick.get_button(i) for i in range(joystick.get_numbuttons())],
                     'hats': [joystick.get_hat(i) for i in range(joystick.get_numhats())]
                 }
-                socketio.emit('controller_data', state)
-                time.sleep(0.03)  # ~33Hz broadcast rate
+                socketio.emit('controller_data', payload)
+                time.sleep(0.03)
             except Exception:
                 break
 
@@ -319,8 +505,8 @@ class CryptoPadApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Crypto90's CryptoPad")
-        self.root.geometry("680x540")
-        self.root.minsize(620, 480)
+        self.root.geometry("680x560")
+        self.root.minsize(620, 500)
 
         # Windows 11 Dark Slate Design Tokens
         self.BG_MAIN = "#121418"
@@ -340,15 +526,16 @@ class CryptoPadApp:
         self._configure_styles()
         self._build_header_ui()
         self._build_url_bar_ui()
+        self._build_profile_bar_ui()
         self._build_main_content_ui()
         self._build_console_ui()
         self._build_status_bar_ui()
 
-        # Update initial preview & poll controller
         self.update_preview()
         self.poll_controller_status()
 
         self.log(f"CryptoPad {CURRENT_VERSION} initialized.", "info")
+        self.log("Cross-Controller Normalization Engine Active.", "success")
         self.log(f"HTTP & WebSocket server running on port {server_port}", "success")
         self.log(f"Localhost URL: http://127.0.0.1:{server_port}", "info")
         if lan_ip != "127.0.0.1":
@@ -393,7 +580,6 @@ class CryptoPadApp:
         )
         version_badge.pack(side=tk.LEFT, padx=4, pady=8)
 
-        # Gamepad Connection Indicator
         self.controller_badge = tk.Label(
             header,
             text="⚪ Detecting Gamepad...",
@@ -405,7 +591,6 @@ class CryptoPadApp:
         )
         self.controller_badge.pack(side=tk.RIGHT, padx=14, pady=8)
 
-        # Port Badge
         port_badge = tk.Label(
             header,
             text=f"🟢 Port: {server_port}",
@@ -420,7 +605,7 @@ class CryptoPadApp:
     def _build_url_bar_ui(self):
         font_family = "Segoe UI" if IS_WINDOWS else "Helvetica"
         url_frame = tk.Frame(self.root, bg=self.BG_MAIN)
-        url_frame.pack(fill=tk.X, padx=14, pady=(8, 4))
+        url_frame.pack(fill=tk.X, padx=14, pady=(8, 2))
 
         tk.Label(
             url_frame,
@@ -428,7 +613,7 @@ class CryptoPadApp:
             font=(font_family, 9, "bold"),
             fg=self.TEXT_PRIMARY,
             bg=self.BG_MAIN
-        ).pack(anchor="w", pady=(0, 4))
+        ).pack(anchor="w", pady=(0, 2))
 
         box = tk.Frame(url_frame, bg=self.BG_CARD, bd=1, relief=tk.FLAT)
         box.pack(fill=tk.X)
@@ -496,12 +681,59 @@ class CryptoPadApp:
         )
         open_btn.pack(side=tk.LEFT, padx=(2, 6), pady=3)
 
+    def _build_profile_bar_ui(self):
+        font_family = "Segoe UI" if IS_WINDOWS else "Helvetica"
+        p_frame = tk.Frame(self.root, bg=self.BG_MAIN)
+        p_frame.pack(fill=tk.X, padx=14, pady=(4, 2))
+
+        box = tk.Frame(p_frame, bg=self.BG_CARD, bd=1, relief=tk.FLAT)
+        box.pack(fill=tk.X, ipady=3)
+
+        tk.Label(
+            box,
+            text="⚡ Cross-Controller Input Profile:",
+            font=(font_family, 8, "bold"),
+            fg=self.TEXT_MUTED,
+            bg=self.BG_CARD
+        ).pack(side=tk.LEFT, padx=(10, 6))
+
+        self.profile_var = tk.StringVar(value=current_input_profile)
+        profile_options = [
+            ("auto", "Auto-Detect (Recommended)"),
+            ("xbox", "Force Xbox (XInput)"),
+            ("playstation", "Force PlayStation (DualShock / DualSense)"),
+            ("nintendo", "Force Nintendo Switch")
+        ]
+
+        self.profile_combo = ttk.Combobox(
+            box,
+            values=[opt[1] for opt in profile_options],
+            state="readonly",
+            style="Custom.TCombobox",
+            width=30
+        )
+        current_label = next((opt[1] for opt in profile_options if opt[0] == current_input_profile), profile_options[0][1])
+        self.profile_combo.set(current_label)
+        self.profile_combo.pack(side=tk.LEFT, padx=4)
+
+        def on_change_profile(event):
+            selected_text = self.profile_combo.get()
+            selected_key = next((opt[0] for opt in profile_options if opt[1] == selected_text), "auto")
+            global current_input_profile
+            current_input_profile = selected_key
+            settings["input_profile"] = current_input_profile
+            save_settings_data(settings)
+            input_profile_queue.put_nowait(current_input_profile)
+            self.log(f"Input mapping profile switched to: {selected_text}", "info")
+
+        self.profile_combo.bind("<<ComboboxSelected>>", on_change_profile)
+
     def _build_main_content_ui(self):
         font_family = "Segoe UI" if IS_WINDOWS else "Helvetica"
         content_frame = tk.Frame(self.root, bg=self.BG_MAIN)
         content_frame.pack(fill=tk.BOTH, expand=True, padx=14, pady=4)
 
-        # Left Column: Controller Layout Category & Skin Selection
+        # Left Column: Controller Skin Selection
         left_box = tk.Frame(content_frame, bg=self.BG_CARD, bd=1, relief=tk.FLAT)
         left_box.pack(side=tk.LEFT, fill=tk.BOTH, expand=False, padx=(0, 8), pady=2)
 
@@ -513,7 +745,6 @@ class CryptoPadApp:
             bg=self.BG_CARD
         ).pack(anchor="w", padx=10, pady=(8, 4))
 
-        # Skin List with Scrollbar
         list_container = tk.Frame(left_box, bg=self.BG_CARD)
         list_container.pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
 
@@ -546,7 +777,7 @@ class CryptoPadApp:
 
         self.skin_listbox.bind("<<ListboxSelect>>", self.on_select_skin)
 
-        # Right Column: High-Res Skin Preview & Gamepad Telemetry
+        # Right Column: High-Res Skin Preview
         right_box = tk.Frame(content_frame, bg=self.BG_CARD, bd=1, relief=tk.FLAT)
         right_box.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(0, 0), pady=2)
 
@@ -562,7 +793,6 @@ class CryptoPadApp:
         )
         self.active_skin_title.pack(side=tk.LEFT)
 
-        # Preview Container
         preview_wrap = tk.Frame(right_box, bg="#0f1115", bd=1, relief=tk.FLAT)
         preview_wrap.pack(fill=tk.BOTH, expand=True, padx=10, pady=4)
 
@@ -575,7 +805,6 @@ class CryptoPadApp:
         )
         self.preview_image_label.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
 
-        # Bottom Bar inside Right Box: Coffee & Refresh
         bottom_bar = tk.Frame(right_box, bg=self.BG_CARD)
         bottom_bar.pack(fill=tk.X, padx=10, pady=(4, 8))
 
@@ -766,15 +995,12 @@ def run_flask_socketio():
 def main():
     enable_high_dpi()
 
-    # Start Flask-SocketIO in daemon thread
     flask_th = threading.Thread(target=run_flask_socketio, daemon=True)
     flask_th.start()
 
-    # Start Pygame controller poller
     ctrl_th = threading.Thread(target=controller_worker, args=(controller_status_queue,), daemon=True)
     ctrl_th.start()
 
-    # Launch GUI
     root = tk.Tk()
     app_gui = CryptoPadApp(root)
 

@@ -41,7 +41,7 @@ End-users do **not** need Python installed. Standalone Windows executables are c
 
 | Version | Asset | Direct Download | Platform |
 | :---: | :---: | :---: | :---: |
-| **v0.2.0** *(Latest)* | `CryptoPad.exe` | [**⬇️ Download v0.2.0 Executable**](https://github.com/Crypto90/CryptoPad/releases/download/0.2.0/CryptoPad.exe) | Windows 10 / 11 (64-bit) |
+| **v0.2.1** *(Latest)* | `CryptoPad.exe` | [**⬇️ Download v0.2.1 Executable**](https://github.com/Crypto90/CryptoPad/releases/download/0.2.1/CryptoPad.exe) | Windows 10 / 11 (64-bit) |
 
 > 📁 Browse all versions and changelogs in [GitHub Releases](https://github.com/Crypto90/CryptoPad/releases).
 
@@ -51,6 +51,10 @@ End-users do **not** need Python installed. Standalone Windows executables are c
 
 <table>
   <tr>
+    <td width="50%">
+      <h3>🔄 Universal Cross-Controller Mapping</h3>
+      Play with an <b>Xbox controller</b> on a <b>PlayStation 4/5</b> skin, or a <b>DualSense</b> on an <b>Xbox</b> skin with zero swapped buttons, inverted axes, or broken D-pads. Includes auto-detection and profile override.
+    </td>
     <td width="50%">
       <h3>🎮 12 Handcrafted Gamepad Skins</h3>
       Includes pixel-perfect vector overlays for <b>Xbox Series X/One</b>, <b>PlayStation 5 (DualSense)</b>, and <b>PlayStation 4 (DualShock 4)</b> in Classic, Dracula, Cosmic Red, Blue, White, and Black editions.
